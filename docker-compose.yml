@@ -1,0 +1,32 @@
+version: "3"
+networks:
+  shared:
+    driver: bridge
+
+services:
+  scraper-app:
+    build: 
+      context: ./web_scraper
+      dockerfile: Dockerfile
+    depends_on:
+        - scraper-mongo
+    ports:
+        - "80:80"
+    networks:
+    - shared
+  scraper-mongo:
+    image: mongodb/mongodb-community-server:latest
+    ports:
+        - "27017:27017"
+    networks:
+    - shared
+  scraper-preprocessing:
+    build: 
+      context: ./pre_processing
+      dockerfile: Dockerfile
+    depends_on:
+        scraper-app:
+            condition: service_completed_successfully
+    networks:
+    - shared
+    command: spark-submit --packages org.mongodb.spark:mongo-spark-connector_2.12:10.3.0 /data/run.py
