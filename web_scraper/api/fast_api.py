@@ -7,7 +7,8 @@ from app.mongo import Database
 from app.config import Settings
 config = Settings()
 
-app = FastAPI()
+app = FastAPI(title='job_scraper API',
+              description='IT job scraper')
 
 class ContractType(Enum):
     contractor = "contractor"
@@ -20,7 +21,7 @@ class Item(BaseModel):
     contracts: list[ContractType]
     location: str
 
-@app.post("/scrape")
+@app.post("/scrape", tags=["SCRAPER"])
 def scrape(item: Item):
     job_scraper = JobScraper(item.job_title,item.contracts,item.location)
     job_scraper.build_base_url()
@@ -31,12 +32,12 @@ def scrape(item: Item):
     
     return {"result": uuid}
 
-@app.get("/scrape/basic_info/{session_id}")
+@app.get("/scrape/basic_info/{session_id}", tags=["SCRAPER"])
 def get_basic_info(session_id: str):
     result = Database(config.basic_info_collection).select_by_session_id(str(session_id))
     return {session_id: result}
 
-@app.get("/scrape/additional_info/{session_id}")
+@app.get("/scrape/additional_info/{session_id}", tags=["SCRAPER"])
 def get_basic_info(session_id: str):
     result = Database(config.additional_info_collection).select_by_session_id(str(session_id))
     return {session_id: result}
