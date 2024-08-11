@@ -13,7 +13,7 @@ WORKDIR /scraper
 
 COPY google-chrome-stable_current_amd64.deb ./
 
-RUN apt install -yf ./google-chrome-stable_current_amd64.deb 
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 
 COPY pyproject.toml poetry.lock ./
 RUN touch README.md
