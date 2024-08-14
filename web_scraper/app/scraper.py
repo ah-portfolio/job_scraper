@@ -27,7 +27,11 @@ class JobScraper:
         
     def build_base_url(self):
         url = config.base_url + urllib.parse.quote(str(self.job_title))
-        
+
+        if self.contracts:
+            for contract in self.contracts:
+                url = url + "&contracts=" + contract.value 
+           
         if self.location:
             url_search_loc = config.base_url_location + self.location
             response = requests.get(url_search_loc)
@@ -35,10 +39,6 @@ class JobScraper:
             url_location = data[0]['key']
             url = url + "&locations=" + urllib.parse.quote(str(url_location))
 
-        if self.contracts:
-            for contract in self.contracts:
-                url = url + "&contracts=" + contract.value 
-   
         self.base_url = url    
         return url
             
@@ -57,16 +57,16 @@ class JobScraper:
             driver.close()
             driver.quit()
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
-        log.info(self.get_url(1))
-        driver.get(self.get_url(1))
         try:
+            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
+            driver.get(self.get_url(1))
             nb_pages = driver.find_element(By.XPATH, labels.nb_pages_xpath)
             self.nb_page = int(nb_pages.text[len(nb_pages.text)-1])
         except:
             self.nb_page = 1
-        driver.close()
-        driver.quit()
+        finally:
+            driver.close()
+            driver.quit()
         return self.nb_page
 
     def scraper_basic_infos(self, url, uuid):
