@@ -28,22 +28,35 @@ class JobScraper:
     def build_base_url(self):
         url = config.base_url + urllib.parse.quote(str(self.job_title))
         
-        if self.contracts:
-            for contract in self.contracts:
-                url = url + "&contracts=" + urllib.parse.quote(str(contract))
-        
         if self.location:
             url_search_loc = config.base_url_location + self.location
             response = requests.get(url_search_loc)
             data = response.json()
             url_location = data[0]['key']
             url = url + "&locations=" + urllib.parse.quote(str(url_location))
+
+        if self.contracts:
+            for contract in self.contracts:
+                url = url + "&contracts=" + contract.value 
+   
         self.base_url = url    
+        return url
             
     def get_url(self, page):
         return self.base_url + f"~&page={page}"
 
     def get_number_of_page_to_scrap(self):
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
+        driver.get(self.base_url)
+        try:
+            no_add_found_text = driver.find_element(By.XPATH, labels.no_add_found).text
+            self.no_add_found = no_add_found_text == "Votre recherche n’aboutit à aucun résultat."
+        except:
+            self.no_add_found = False
+        finally:
+            driver.close()
+            driver.quit()
+
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
         log.info(self.get_url(1))
         driver.get(self.get_url(1))
@@ -80,6 +93,14 @@ class JobScraper:
                 job_type = job_type_and_title[0].text.split("\n")[0]
                 job_title = job_type_and_title[0].text.split("\n")[1]
                 output_ad["job_title"] = job_title
+
+                try:
+                    contract_types_div = ad.find_element(By.XPATH, labels.contract_types_div_xpath) 
+                    contract_types = contract_types_div.find_elements(By.XPATH, labels.contract_types_xpath)
+                    contract_types = [contract_type.text for contract_type in contract_types]
+                except:
+                    contract_types = []
+                output_ad["contract_types"] = contract_types
 
                 job_description_div = ad.find_element(
                     By.XPATH, labels.job_description_div_xpath
@@ -151,7 +172,10 @@ class JobScraper:
             Database(config.additional_info_collection).insert(output_ads)
     
     def run(self, nb_of_page, uuid):
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            for url in [self.get_url(page) for page in range(1, nb_of_page+1)]:
-                executor.submit(self.scraper_basic_infos, url, uuid)
-                executor.submit(self.get_additional_infos, url, uuid)
+        if self.no_add_found :
+            return
+        else :
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                for url in [self.get_url(page) for page in range(1, nb_of_page+1)]:
+                    executor.submit(self.scraper_basic_infos, url, uuid)
+                    executor.submit(self.get_additional_infos, url, uuid)

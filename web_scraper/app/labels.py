@@ -1,11 +1,14 @@
 ###
 nb_pages_xpath = '//div[@class="flex flex-wrap justify-between items-stretch gap-1 p-2 rounded-lg bg-white shadow mb-4"]'
-
+no_add_found = '//div[@class="font-semibold"]'
 ads_xpath = '//div[@class="mb-4 relative rounded-lg max-full bg-white flex flex-col cursor-pointer shadow hover:shadow-md"]'
 company_xpath = './/div[@class="text-base font-medium truncate w-full"]'
 publish_date_xpath = './/div[@class="text-sm whitespace-nowrap"]'
 
 job_type_and_title_xpath = './/a[@class="after:absolute after:inset-0"]'
+
+contract_types_div_xpath = './/div[@class="tags absolute top-0 left-0 p-3 flex overflow-hidden w-full"]'
+contract_types_xpath = './/div[@class="truncate py-[2px]"]'
 
 job_description_div_xpath = './/div[@class="html-renderer line-clamp-3 mb-4"]'
 job_description_xpath = ".//p"
