@@ -20,3 +20,13 @@ services:
         - "27017:27017"
     networks:
     - shared
+  front-app:
+    build: 
+      context: ./front_end
+      dockerfile: Dockerfile
+    depends_on:
+        - scraper-app
+    ports:
+        - "8501:8501"
+    networks:
+    - shared
