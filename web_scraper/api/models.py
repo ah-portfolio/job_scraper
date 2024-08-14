@@ -20,6 +20,7 @@ class JobFilters(BaseModel):
 class AddtionalInfo(BaseModel):
     job_url: str
     additional_info: list[str]
+    skills: list[str]
 
 class AddtionalInfoResponses(RootModel):
      root: dict[UUID, list[AddtionalInfo]] = Field(..., 

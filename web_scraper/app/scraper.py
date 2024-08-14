@@ -33,7 +33,7 @@ class JobScraper:
                 url = url + "&contracts=" + contract.value 
            
         if self.location:
-            url_search_loc = config.base_url_location + self.location
+            url_search_loc = config.base_url_location + self.location.capitalize()
             response = requests.get(url_search_loc)
             data = response.json()
             url_location = data[0]['key']
@@ -162,6 +162,13 @@ class JobScraper:
                 except:
                     log.info(f"No additional info found for this url: {job_url}")
                     pass
+
+                try:
+                    skills = ad.find_elements(By.XPATH, labels.skills_fullscreen_xpath)
+                    skills = [skill.text for skill in skills]
+                except:
+                    skills = []
+                output_ad["skills"] = skills
 
                 output_ads[session_id] = output_ad
                 session_id += 1

@@ -24,3 +24,5 @@ ads_fullscreen_xpath = '//div[@class="mb-4 relative flex flex-col lg:flex-row it
 side_ad_fullscreen_xpath = './/span[@class="text-sm truncate w-full"]'
 side_ad_fullscreen_xpath2 = './/span[@class="flex gap-2 items-center"]'
 side_ad_fullscreen_xpath2bis = './/time[@class="text-sm"]/@datetime'
+
+skills_fullscreen_xpath = './/span[@class="fw-text-highlight"]'
